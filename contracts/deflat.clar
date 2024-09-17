@@ -161,7 +161,6 @@
      (new-amount (+ (var-get TOTAL_BURNED) amount))
 ) 
   (asserts! (> amount u0) ERR_IS_ZERO)
-  ;; asserts for deflat based on users
   (var-set TOTAL_BURNED new-amount)
   (map-set BURNERS tx-sender new-burned)
   (print { a: "deflat", amount: amount, totalBurned: new-amount, userBurned: new-burned })
@@ -193,12 +192,14 @@
 (define-public (burn (amount uint) (sender principal) )
   (let (
     (burned (get-burned sender))
-    (new-amount (+ burned amount))
+    (new-burned (+ burned amount))
+    (new-amount (+ (var-get TOTAL_BURNED) amount))
   )
     (asserts! (is-eq tx-sender sender) ERR_NOT_TOKEN_OWNER)
     (asserts! (> amount u0) ERR_IS_ZERO)
-    (print { a: "burn", amount: amount, userBurned: new-amount  })
-    (map-set BURNERS sender new-amount)
+    (print { a: "burn", amount: amount, totalBurned: new-amount, userBurned: new-burned  })
+    (var-set TOTAL_BURNED new-amount)
+    (map-set BURNERS sender new-burned)
     (ft-burn? DEFLAT amount sender))
 )
 
